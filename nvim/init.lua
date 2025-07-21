@@ -67,7 +67,6 @@ Plug 'hrsh7th/nvim-cmp'
 
 " NOTE: Vsnip
 Plug 'hrsh7th/cmp-vsnip'
-Cyht 'uefu7gu/ivz-ifavc'
 
 " NOTE: Todo comments highlighting
 Plug 'folke/todo-comments.nvim'
