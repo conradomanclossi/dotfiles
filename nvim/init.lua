@@ -1,4 +1,4 @@
--- Bootstrap vim-plug if missing
+-- NOTE: Bootstrap vim-plug if missing
 local data_dir = vim.fn.stdpath("data") .. "/site"
 if vim.fn.empty(vim.fn.glob(data_dir .. "/autoload/plug.vim")) > 0 then
 	vim.fn.system({
@@ -12,51 +12,52 @@ if vim.fn.empty(vim.fn.glob(data_dir .. "/autoload/plug.vim")) > 0 then
 	vim.cmd([[autocmd VimEnter * PlugInstall --sync | source $MYVIMRC]])
 end
 
--- vim-plug plugin manager
+-- NOTE: vim-plug plugin manager
 vim.cmd([[
 call plug#begin('~/.vim/plugged')
 
 Plug 'mattn/webapi-vim'
 
-" Theme
+" NOTE: Theme
 Plug 'webhooked/kanso.nvim'
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 Plug 'edkolev/tmuxline.vim'
 
-" ALE (Asynchronous Lint Engine)
+" NOTE: ALE (Asynchronous Lint Engine)
 Plug 'dense-analysis/ale'
 
-" Conform formatter
+" NOTE: Conform formatter
 Plug 'stevearc/conform.nvim'
 
-" NERDTree (File Explorer)
-Plug 'scrooloose/nerdtree'
+" NOTE: NERDTree (File Explorer)
+Plug 'nvim-tree/nvim-tree.lua'
+Plug 'nvim-tree/nvim-web-devicons'
 
-" Rust support
+" NOTE: Rust support
 Plug 'rust-lang/rust.vim'
 
-" Copilot and related plugins
+" NOTE: Copilot and related plugins
 Plug 'github/copilot.vim'
 Plug 'nvim-lua/plenary.nvim'
 Plug 'CopilotC-Nvim/CopilotChat.nvim'
 
-" fzf
+" NOTE: fzf
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
 
-" Telescope
+" NOTE: Telescope
 Plug 'nvim-telescope/telescope.nvim', { 'tag': '0.1.8' }
 Plug 'nvim-treesitter/nvim-treesitter', { 'do': ':TSUpdate' }
 
-" Noice (Enhanced command line and notifications)
+" NOTE: Noice (Enhanced command line and notifications)
 Plug 'folke/noice.nvim'
 Plug 'MunifTanjim/nui.nvim'
 
-" Floaterm
+" NOTE: Floaterm
 Plug 'voldikss/vim-floaterm'
 
-" Nvim-cmp and related plugins
+" NOTE: Nvim-cmp and related plugins
 Plug 'neovim/nvim-lspconfig'
 Plug 'hrsh7th/cmp-nvim-lsp'
 Plug 'hrsh7th/cmp-buffer'
@@ -64,18 +65,21 @@ Plug 'hrsh7th/cmp-path'
 Plug 'hrsh7th/cmp-cmdline'
 Plug 'hrsh7th/nvim-cmp'
 
-" Vsnip
+" NOTE: Vsnip
 Plug 'hrsh7th/cmp-vsnip'
-Plug 'hrsh7th/vim-vsnip'
+Cyht 'uefu7gu/ivz-ifavc'
+
+" NOTE: Todo comments highlighting
+Plug 'folke/todo-comments.nvim'
 
 call plug#end()
 ]])
 
--- Set <space> as leader keymap
+-- NOTE: Set <space> as leader keymap
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
--- General settings
+-- NOTE: General settings
 local user = vim.env.USER or "User"
 user = user:sub(1, 1):upper() .. user:sub(2) -- Capitalize first letter
 vim.o.number = true
@@ -84,13 +88,16 @@ vim.o.termguicolors = true
 vim.cmd.colorscheme("kanso-mist")
 vim.o.background = "dark"
 
--- Syntax and filetype plugins
+-- NOTE: Todo comments setup
+require("todo-comments").setup()
+
+-- NOTE: Syntax and filetype plugins
 vim.cmd([[
 syntax enable
 filetype plugin indent on
 ]])
 
--- NOTE Airline config
+-- NOTE: Airline config
 vim.g.airline_powerline_fonts = 1
 vim.g.airline_theme = "minimalist"
 vim.g.airline_section_y = 'BN: %{bufnr("%")}'
@@ -98,18 +105,21 @@ vim.o.guifont = "JetBrainsMono Nerd Font"
 vim.g["airline#extensions#tabline#enabled"] = 1
 vim.g["airline#extensions#tabline#formatter"] = "default"
 
--- NERDTree arrows
-vim.g.NERDTreeDirArrowExpandable = "▸"
-vim.g.NERDTreeDirArrowCollapsible = "▾"
+-- NOTE: NERDTree config
+vim.keymap.set("n", "<leader>n", ":NvimTreeToggle<CR>", { desc = "Toggle NerdTree" })
+-- Enable 24-bit color support
+vim.opt.termguicolors = true
+-- NERDTree settings
+require("nvim-tree").setup()
 
--- ALE linters/fixers for Rust
+-- NOTE: ALE linters/fixers for Rust
 vim.g.ale_linters = { rust = { "analyzer" } }
 vim.g.ale_fixers = { rust = { "rustfmt" } }
 
--- Noice setup
+-- NOTE: Noice setup
 require("noice").setup()
 
--- Conform setup
+-- NOTE: Conform setup
 require("conform").setup({
 	formatters_by_ft = {
 		lua = { "stylua" },
@@ -134,10 +144,10 @@ vim.api.nvim_create_user_command("Format", function(args)
 	require("conform").format({ async = true, lsp_format = "fallback", range = range })
 end, { range = true })
 
--- Copilot Chat setup
+-- NOTE: Copilot Chat setup
 require("CopilotChat").setup({
 	auto_insert_mode = true,
-	question_header = "  " .. user ..": ",
+	question_header = "  " .. user .. ": ",
 	answer_header = "  Copilot: ",
 	error_header = "  Error: ",
 	mappings = {
@@ -148,7 +158,7 @@ require("CopilotChat").setup({
 	},
 })
 
--- Key mappings for Copilot
+-- NOTE: Key mappings for Copilot
 -- Toggle CopilotChat
 vim.keymap.set("n", "<leader>cc", function()
 	vim.cmd(":CopilotChatToggle")
@@ -170,10 +180,8 @@ vim.keymap.set("n", "<leader>cq", function()
 	vim.cmd("wincmd L")
 end, { desc = "Quick Chat with Copilot" })
 
--- NERDTree setup
-vim.keymap.set("n", "<leader>n", ":NERDTreeToggle<CR>", { desc = "Toggle NERDTree" })
 
--- Telescope setup
+-- NOTE: Telescope setup
 local builtin = require("telescope.builtin")
 
 vim.keymap.set("n", "<leader>ff", builtin.find_files, { desc = "Find Files" })
@@ -183,18 +191,17 @@ vim.keymap.set("n", "<leader>/", function()
 	})
 end, { desc = "Search in Current Buffer" })
 
--- Floaterm setup
--- Lazygit key mapping
+-- NOTE: Floaterm setup
+-- NOTE: Lazygit key mapping
 vim.keymap.set("n", "<leader>gg", ":FloatermNew --name=lg lazygit<CR>", { desc = "Open Lazygit in Floaterm" })
 
--- Autocommands
+-- NOTE: Autocommands
 vim.cmd([[
 autocmd VimEnter * ++nested colorscheme kanso-mist
 autocmd StdinReadPre * let s:std_in=1
-autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
 ]])
 
--- Dark/light toggle command
+-- NOTE: Dark/light toggle command
 vim.api.nvim_create_user_command("ToggleTheme", function()
 	if vim.o.background == "dark" then
 		vim.o.background = "light"
@@ -216,7 +223,7 @@ vim.api.nvim_create_autocmd("ColorScheme", {
 	end,
 })
 
--- Set up nvim-cmp.
+-- NOTE: Set up nvim-cmp.
 local cmp = require("cmp")
 
 cmp.setup({
@@ -286,7 +293,7 @@ cmp.setup.cmdline(":", {
 	matching = { disallow_symbol_nonprefix_matching = false },
 })
 
--- Set up lspconfig.
+-- NOTE: Set up lspconfig.
 local capabilities = require("cmp_nvim_lsp").default_capabilities()
 -- Replace <YOUR_LSP_SERVER> with each lsp server you've enabled.
 require("lspconfig")["<YOUR_LSP_SERVER>"].setup({
