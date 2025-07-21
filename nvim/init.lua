@@ -139,7 +139,13 @@ require("CopilotChat").setup({
 	auto_insert_mode = true,
 	question_header = "  " .. user ..": ",
 	answer_header = "  Copilot: ",
-	error_header = "  Error: "
+	error_header = "  Error: ",
+	mappings = {
+		complete = {
+			insert = "<C-Tab>",
+			normal = "<C-Tab>",
+		},
+	},
 })
 
 -- Key mappings for Copilot
