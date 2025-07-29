@@ -48,7 +48,10 @@ Plug 'junegunn/fzf.vim'
 
 " NOTE: Telescope
 Plug 'nvim-telescope/telescope.nvim', { 'tag': '0.1.8' }
+
+" NOTE: Treesitter (Syntax highlighting and more)
 Plug 'nvim-treesitter/nvim-treesitter', { 'do': ':TSUpdate' }
+Plug 'interdependence/tree-sitter-htmldjango' " For htmldjango support
 
 " NOTE: Noice (Enhanced command line and notifications)
 Plug 'folke/noice.nvim'
@@ -70,6 +73,9 @@ Plug 'hrsh7th/cmp-vsnip'
 
 " NOTE: Todo comments highlighting
 Plug 'folke/todo-comments.nvim'
+
+" NOTE: Obsidian.nvim
+Plug 'epwalsh/obsidian.nvim'
 
 call plug#end()
 ]])
@@ -123,11 +129,26 @@ require("conform").setup({
 	formatters_by_ft = {
 		lua = { "stylua" },
 		-- Conform will run multiple formatters sequentially
-		python = { "isort", "black" },
+		python = { "isort", "black", "prettierd", stop_after_first = true },
 		-- You can customize some of the format options for the filetype (:help conform.format)
 		rust = { "rustfmt", lsp_format = "fallback" },
 		-- Conform will run the first available formatter
-		javascript = { "prettierd", "prettier", stop_after_first = true },
+		javascript = { "prettierd" },
+		typescript = { "prettierd" },
+		html = { "djhtml" },
+		htmldjango = { "djhtml" },
+	},
+	formatters = {
+		djhtml = {
+			command = "djhtml",
+			args = { "$FILENAME" },
+			stdin = false,
+		},
+	},
+	-- Save the formatted file after formatting
+	format_on_save = {
+		timeout_ms = 500, -- Timeout for formatting in milliseconds
+		lsp_format = "fallback", -- Use LSP formatting as a fallback
 	},
 })
 
@@ -179,7 +200,6 @@ vim.keymap.set("n", "<leader>cq", function()
 	vim.cmd("wincmd L")
 end, { desc = "Quick Chat with Copilot" })
 
-
 -- NOTE: Telescope setup
 local builtin = require("telescope.builtin")
 
@@ -189,6 +209,24 @@ vim.keymap.set("n", "<leader>/", function()
 		prompt_title = "Search in Current Buffer",
 	})
 end, { desc = "Search in Current Buffer" })
+
+-- NOTE: Treesitter setup
+require("nvim-treesitter.configs").setup({
+	ensure_installed = { "markdown", "markdown_inline", ... },
+	highlight = {
+		enable = true,
+	},
+})
+
+local parser_config = require("nvim-treesitter.parsers").get_parser_configs()
+parser_config.htmldjango = {
+	filetype = "htmldjango",
+	install_info = {
+		url = "https://github.com/interdependence/tree-sitter-htmldjango",
+		files = { "src/parser.c" },
+	},
+	filetype = "htmljinja",
+}
 
 -- NOTE: Floaterm setup
 -- NOTE: Lazygit key mapping
@@ -297,4 +335,14 @@ local capabilities = require("cmp_nvim_lsp").default_capabilities()
 -- Replace <YOUR_LSP_SERVER> with each lsp server you've enabled.
 require("lspconfig")["<YOUR_LSP_SERVER>"].setup({
 	capabilities = capabilities,
+})
+
+-- NOTE: Set up Obsidian.nvim
+require("obsidian").setup({
+	workspaces = {
+		{
+			name = "vault",
+			path = "/Users/conradomanclossi/Library/Mobile Documents/iCloud~md~obsidian/Documents/Conrado",
+		},
+	},
 })
