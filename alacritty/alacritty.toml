@@ -1,0 +1,9 @@
+[env]
+TERM = "xterm-256color"
+
+[general]
+import = [
+	"./themes/themes/kanso_mist.toml",
+	"font.toml"
+]
+
